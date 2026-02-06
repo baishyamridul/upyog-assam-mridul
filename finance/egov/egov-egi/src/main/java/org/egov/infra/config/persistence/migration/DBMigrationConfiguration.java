@@ -122,8 +122,22 @@ public class DBMigrationConfiguration {
             }
         }
 
-        return null;
+       // return new Flyway();
+       return null;
     }
+
+    // private void migrateDatabase(DataSource dataSource, String schema, String... locations) {
+    //     Flyway flyway = new Flyway();
+    //     flyway.setBaselineOnMigrate(true);
+    //     flyway.setValidateOnMigrate(validateOnMigrate);
+    //     flyway.setOutOfOrder(true);
+    //     flyway.setLocations(locations);
+    //     flyway.setDataSource(dataSource);
+    //     flyway.setSchemas(schema);
+    //     if (repairMigration)
+    //         flyway.repair();
+    //     flyway.migrate();
+    // }
 
     private void migrateDatabase(DataSource dataSource, String schema, String... locations) {
     	// Use Flyway.configure() to create a Flyway instanceAdd commentMore actions

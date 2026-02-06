@@ -111,10 +111,6 @@
             <version>20141113</version>
         </dependency>
 
-        <dependency>
-	    <groupId>com.fasterxml.jackson.core</groupId>
-	    <artifactId>jackson-databind</artifactId>	    
-		</dependency>
 
         <!-- STRUTS2 DEPENDENCIES START -->
         <dependency>
@@ -244,6 +240,14 @@
             <artifactId>commons-dbcp</artifactId>
         </dependency>
         <!-- COMMONS END -->
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

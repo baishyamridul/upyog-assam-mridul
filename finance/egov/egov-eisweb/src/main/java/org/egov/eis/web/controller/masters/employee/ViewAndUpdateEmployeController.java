@@ -58,6 +58,7 @@ import org.egov.eis.service.OldEmployeeService;
 import org.egov.eis.service.JurisdictionService;
 import org.egov.infra.admin.master.service.BoundaryTypeService;
 import org.egov.infra.admin.master.service.DepartmentService;
+//import org.postgresql.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -71,11 +72,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javaxt.utils.Base64;
-
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Arrays;
+
+import javaxt.utils.Base64;
 
 @Controller
 @RequestMapping(value = "/employee")

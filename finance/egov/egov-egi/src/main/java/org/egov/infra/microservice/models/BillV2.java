@@ -84,9 +84,6 @@ public class BillV2 {
     @SafeHtml
     @JsonProperty("id")
     private String id = null;
-    
-	@JsonProperty("userId")
-	private String userId;
 
     @SafeHtml
     @JsonProperty("mobileNumber")

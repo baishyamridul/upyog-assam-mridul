@@ -1470,12 +1470,13 @@ public class CommonAction extends BaseFormAction {
         else {
             final Accountdetailtype detailType = (Accountdetailtype) persistenceService.find(
                     "from Accountdetailtype where id=? order by name", accountDetailType);
-            final String table = detailType.getFullQualifiedName();
-            accountDetailTypeName = detailType.getName();
+            final String table = detailType.getFullQualifiedName(); // org.egov.eis.entity.Employee
+            accountDetailTypeName = detailType.getName(); // EMPLOYEE
             try {
                 final Class<?> service = Class.forName(table);
                 String simpleName = service.getSimpleName();
                 simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1) + "Service";
+                // employeeService
 
                 final WebApplicationContext wac = WebApplicationContextUtils.getWebApplicationContext(ServletActionContext
                         .getServletContext());
@@ -1483,6 +1484,9 @@ public class CommonAction extends BaseFormAction {
 
                 entityService = (EntityTypeService) wac.getBean(simpleName);
                 entitiesList = (List<EntityType>) entityService.getAllActiveEntities(accountDetailType);
+                for (EntityType abc : entitiesList) {
+                    LOGGER.info(abc.toString());
+                }
             } catch (final EntityNotFoundException e) {
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug("Service Not Available Exception : " + e.getMessage());
@@ -3744,11 +3748,14 @@ public class CommonAction extends BaseFormAction {
     @Action(value = "/voucher/common-ajaxYearCode")
     public String ajaxYearCode() {
         try {
+            LOGGER.info("mridx!");
+            LOGGER.info("Bank Account="+bankaccount +", Department Id ="+departmentId);
             if (bankaccount != null && departmentId != null) {
                 yearCodeList = persistenceService
                         .findAllBy(new StringBuilder("select DISTINCT fs from AccountCheques ac, CFinancialYear fs, ChequeDeptMapping cd where ac.serialNo = fs.id")
                                 .append(" and bankAccountId = ? and ac.id = cd.accountCheque and cd.allotedTo =? order by fs.id desc ").toString(),
                                 bankaccount.longValue(), departmentId.toString());
+                // todo log here
             }
         } catch (final HibernateException e) {
             LOGGER.error("Exception occured while getting year code " + e.getMessage(),

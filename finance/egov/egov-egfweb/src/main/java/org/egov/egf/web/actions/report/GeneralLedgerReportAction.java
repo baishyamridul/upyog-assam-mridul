@@ -224,13 +224,10 @@ public class GeneralLedgerReportAction extends BaseFormAction {
 			glCode = (CChartOfAccounts) persistenceService.find("from CChartOfAccounts where glcode = ?",
 					generalLedgerReportBean.getGlCode1());
 			if (generalLedgerReportBean.getFund_id().isEmpty()) {
-
-				fund = (Fund) persistenceService.find("from Fund where id = ?", Long.valueOf("0"));
-
+				fund = (Fund) persistenceService.find("from Fund where id = ?", 0);
 			} else
 				fund = (Fund) persistenceService.find("from Fund where id = ?",
 						Long.valueOf(generalLedgerReportBean.getFund_id()));
-		
 		}
 		if (fund == null && glCode!=null) {
 			heading = "General Ledger Report for " + glCode.getGlcode() + ":" + glCode.getName() + " from "

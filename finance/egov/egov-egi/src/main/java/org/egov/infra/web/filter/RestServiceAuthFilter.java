@@ -71,7 +71,6 @@ public class RestServiceAuthFilter implements Filter {
 		LOGGER.info("Rest service authentication initiated");
 
 		HttpServletRequest httpRequest = (HttpServletRequest) req;
-		LOGGER.info("req inside do filter"+req);
 		HttpServletResponse httpResponse = (HttpServletResponse) res;
 
 		HTTPUtilities httpUtilities = ESAPI.httpUtilities();
@@ -87,14 +86,12 @@ public class RestServiceAuthFilter implements Filter {
 		} else if (httpRequest.getRequestURI().contains("/rest/voucher/")) {
 			try {
 				RestRequestWrapper request = new RestRequestWrapper(httpRequest);
-				LOGGER.info("***request  inside doFilter"+request);
 				String tenantId = readTenantId(request);
 				String userToken = readAuthToken(request, tenantId);
 				HttpSession session = httpRequest.getSession();
 				session.setAttribute(MS_TENANTID_KEY, tenantId);
 				session.setAttribute(MS_USER_TOKEN, userToken);
 				CurrentUser user = new CurrentUser(this.getUserDetails(request));
-				LOGGER.info("***user from CurrentUser inside doFilter"+user);
 				Authentication auth = this.prepareAuthenticationObj(request, user);
 				SecurityContextHolder.getContext().setAuthentication(auth);
 				chain.doFilter(request, res);
@@ -168,9 +165,8 @@ public class RestServiceAuthFilter implements Filter {
 		session.setAttribute(MS_USER_TOKEN, userToken);
 		CustomUserDetails user = this.microserviceUtils.getUserDetails(userToken, adminToken);
 		session.setAttribute(MS_TENANTID_KEY, user.getTenantId());
-		LOGGER.info("userToken inside getUserDetails:" + userToken);
 		UserSearchResponse response = this.microserviceUtils.getUserInfo(userToken, user.getTenantId(), user.getUuid());
-		LOGGER.info("response inside getUserDetails:" + response);
+
 		return parepareCurrentUser(response.getUserSearchResponseContent().get(0));
 	}
 

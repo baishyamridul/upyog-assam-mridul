@@ -335,7 +335,8 @@ public class BudgetRegisterController extends GenericWorkFlowController {
 
             }
 
-            return "redirect:/budget/register/workflow/view/" + currentBudgetRegister.getBudgetRegisterNumber();
+//            return "redirect:/budget/register/workflow/view/" + currentBudgetRegister.getBudgetRegisterNumber();
+            return "success";
         }
 
         budgetRegisterWorkflowService.createBudgetRegisterWorkFlowTransitionNew(currentBudgetRegister, approvalPosition,

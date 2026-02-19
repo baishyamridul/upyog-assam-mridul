@@ -978,4 +978,9 @@
         <put-attribute name="body" value="/WEB-INF/views/faq/view_faqs.jsp" />
     </definition>
 
+    <definition name="success" extends="base_layout">
+        <put-attribute name="page-title" value="title.success" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/common/success.jsp" />
+    </definition>
+
 </tiles-definitions>

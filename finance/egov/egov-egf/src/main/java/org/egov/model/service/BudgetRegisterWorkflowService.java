@@ -15,6 +15,7 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.model.budget.BudgetRegister;
+import org.egov.model.budget.register.BudgetRegisterActionsDTO;
 import org.egov.model.repository.BudgetRegisterWorkflowRepository;
 import org.egov.pims.commons.Position;
 import org.egov.utils.FinancialConstants;
@@ -26,7 +27,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.egov.egf.statefinance.event.StateFinanceEventType;
+import org.egov.egf.statefinance.event.listener.StateFinanceService;
+import org.egov.egf.statefinance.model.BudgetRegisterResponse;
+import org.egov.egf.statefinance.model.BudgetRegisterWrapper;
+import org.springframework.validation.BindingResult;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +59,9 @@ public class BudgetRegisterWorkflowService {
 
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
+
+    @Autowired
+    private StateFinanceService stateFinanceService;
 
 
 
@@ -633,6 +643,100 @@ public class BudgetRegisterWorkflowService {
     public void save(BudgetRegister currentBudgetRegister) {
         budgetRegisterWorkflowRepository.save(currentBudgetRegister);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void forwardToStateForApproval(final BudgetRegister budgetRegister, final Long approvalPosition, final String approvalComment, final String additionalRule, final String workFlowAction, final String approvalDesignation, final String cityName, final String tenantId ) throws Exception {
+
+        final User user = securityUtils.getCurrentUser();
+
+        final DateTime currentDate = new DateTime();
+
+        WorkFlowMatrix workFlowMatrix = egBudgetRegisterWorkflowService.getWfMatrix(budgetRegister.getStateType(), null, null, additionalRule, budgetRegister.getCurrentState().getValue(), null);
+
+
+        String stateValue = "";
+
+        if (stateValue.isEmpty()) {
+            stateValue = workFlowMatrix.getNextState();
+        }
+
+        EgwStatus egwStatus = egwStatusDAO.getStatusByModuleAndCode(FinancialConstants.BUDGET_MODULE, FinancialConstants.BUDGET_FORWARDED_FROM_EO);
+
+        budgetRegister.transition().progressWithStateCopy()
+                .withSenderName(user.getUsername() + "::" + user.getName())
+                .withStateValue(stateValue)
+                .withComments(approvalComment)
+                .withDateInfo(new Date())
+                .withOwner(null)
+                .withNextAction(workFlowMatrix.getNextAction())
+                .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_BUDGET_REGISTER_DISPLAYNAME);
+
+        budgetRegister.setStatus(egwStatus);
+
+
+        save(budgetRegister);
+
+
+        stateFinanceService.forwardBudgetForApproval(StateFinanceEventType.BUDGET_APPROVAL, BudgetRegisterWrapper.fromBudgetRegister(budgetRegister, microServiceUtil.getTenentId(), cityName));
+
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void handleBudgetActionFromState(@Valid final BudgetRegisterActionsDTO budgetRegisterActionsDTO, final BindingResult bindingResult) {
+
+        // check current state,
+        // if action already handled return safely
+        // if action is to approve, mark the budget register as approved,
+        // and work flow state to end
+        // if it is to reject, mark as rejected and workflow state to end
+
+        BudgetRegister budgetRegister = findOne(budgetRegisterActionsDTO.budgetRegister.getBudgetRegisterId());
+
+        if (budgetRegister == null) {
+            bindingResult.reject("error", "Not found !");
+            return;
+        }
+
+
+        if (budgetRegisterActionsDTO.action == BudgetRegisterActionsDTO.BudgetRegisterAction.APPROVE) {
+            //
+
+            budgetRegister.transition()
+                    .end()
+                    .withSenderName("DMA")
+                    .withComments("Approved from dma")
+                    .withStateValue("Approved")
+                    .withOwner(null)
+                    .withDateInfo(new Date())
+                    .withNextAction("")
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_BUDGET_REGISTER_DISPLAYNAME);
+
+            budgetRegister.setStatus(egwStatusDAO.getStatusByModuleAndCode(FinancialConstants.BUDGET_MODULE, FinancialConstants.BUDGET_APPROVED_STATUS));
+
+
+        } else  {
+            budgetRegister.transition()
+                    .end()
+                    .withSenderName("DMA")
+                    .withComments("Rejected from dma")
+                    .withStateValue("Rejected")
+                    .withDateInfo(new Date())
+                    .withOwner(null)
+                    .withNextAction("")
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_BUDGET_REGISTER_DISPLAYNAME);
+
+            budgetRegister.setStatus(egwStatusDAO.getStatusByModuleAndCode(FinancialConstants.BUDGET_MODULE, FinancialConstants.BUDGET_REJECTED_STATUS));
+
+        }
+
+
+
+        save(budgetRegister);
+
+    }
+
+
 }
 
 

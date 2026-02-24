@@ -328,14 +328,20 @@ public class BudgetRegisterController extends GenericWorkFlowController {
             String cityName = microServiceUtil.getHeaderNameForTenant();
 
             try {
-                BudgetRegisterResponse response  = stateFinanceService.forwardBudgetForApproval(StateFinanceEventType.BUDGET_APPROVAL, BudgetRegisterWrapper.fromBudgetRegister(currentBudgetRegister, microServiceUtil.getTenentId(), cityName));
-            } catch (RestClientException exception) {
+
+                budgetRegisterWorkflowService.forwardToStateForApproval(currentBudgetRegister, approvalPosition, approvalComment, null, workFlowAction, approvalDesignation, cityName, microServiceUtil.getTenentId());
+
+//                BudgetRegisterResponse response  = stateFinanceService.forwardBudgetForApproval(StateFinanceEventType.BUDGET_APPROVAL, BudgetRegisterWrapper.fromBudgetRegister(currentBudgetRegister, microServiceUtil.getTenentId(), cityName));
+
+            } catch (Exception exception) {
                 exception.printStackTrace();
                 return "error/422";
 
             }
 
 //            return "redirect:/budget/register/workflow/view/" + currentBudgetRegister.getBudgetRegisterNumber();
+
+            model.addAttribute("message", "Budget has been forwarded to DMA for approval.");
             return "success";
         }
 

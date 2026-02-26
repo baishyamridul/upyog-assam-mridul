@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.egov.egf.statefinance.event.StateFinanceEventType;
@@ -32,6 +33,7 @@ import org.egov.egf.statefinance.event.listener.StateFinanceService;
 import org.egov.egf.statefinance.model.BudgetRegisterResponse;
 import org.egov.egf.statefinance.model.BudgetRegisterWrapper;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.client.RestClientException;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -683,7 +685,7 @@ public class BudgetRegisterWorkflowService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void handleBudgetActionFromState(@Valid final BudgetRegisterActionsDTO budgetRegisterActionsDTO, final BindingResult bindingResult) {
+    public void handleBudgetActionFromState(@Valid final BudgetRegisterActionsDTO budgetRegisterActionsDTO, final BindingResult bindingResult) throws Exception {
 
         // check current state,
         // if action already handled return safely
@@ -698,9 +700,15 @@ public class BudgetRegisterWorkflowService {
             return;
         }
 
+        if (budgetRegister.getCurrentState().isEnded()) {
+            throw new RestClientException(
+                    "Budget transition already ended.");
+        }
 
         if (budgetRegisterActionsDTO.action == BudgetRegisterActionsDTO.BudgetRegisterAction.APPROVE) {
             //
+
+
 
             budgetRegister.transition()
                     .end()

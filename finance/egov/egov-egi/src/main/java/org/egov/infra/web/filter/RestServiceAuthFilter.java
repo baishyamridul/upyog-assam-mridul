@@ -83,7 +83,7 @@ public class RestServiceAuthFilter implements Filter {
 		} else if (httpRequest.getRequestURI().contains("/rest/logout")) {
 			LOGGER.info("*****LOGOUT Request forward****");
 			chain.doFilter(req, res);
-		} else if (httpRequest.getRequestURI().contains("/rest/voucher/")) {
+		} else if (httpRequest.getRequestURI().contains("/rest/voucher/") || httpRequest.getRequestURI().contains("/rest/budget/")) {
 			try {
 				RestRequestWrapper request = new RestRequestWrapper(httpRequest);
 				String tenantId = readTenantId(request);

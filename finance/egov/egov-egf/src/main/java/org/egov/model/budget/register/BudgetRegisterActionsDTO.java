@@ -23,7 +23,6 @@ public class BudgetRegisterActionsDTO extends RequestInfoWrapper {
 
     public String tenantId;
 
-    @JsonProperty("budgetregister")
     public BudgetRegisterDTO budgetRegister;
 
 

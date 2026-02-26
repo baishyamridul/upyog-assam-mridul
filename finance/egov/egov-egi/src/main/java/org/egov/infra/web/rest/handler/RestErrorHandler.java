@@ -37,6 +37,10 @@ public class RestErrorHandler implements ResponseErrorHandler {
 			throw new RestClientException(
 					  "Api Service Failure : " + status.value());
 		}
+		else if (status == HttpStatus.METHOD_NOT_ALLOWED) {
+			throw new RestClientException(
+					"Api Service Failure : " + status.value());
+		}
 
 //		else if (status.is4xxClientError() || status.is5xxServerError()) {
 //			  throw new RestClientException(

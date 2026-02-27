@@ -3,6 +3,7 @@ package org.egov.model.service;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.egf.autonumber.BudgetRegisterNumberGenerator;
 import org.egov.eis.entity.Assignment;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
@@ -10,6 +11,7 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -65,6 +67,8 @@ public class BudgetRegisterWorkflowService {
     @Autowired
     private StateFinanceService stateFinanceService;
 
+    @Autowired
+    private AutonumberServiceBeanResolver beanResolver;
 
 
 
@@ -742,6 +746,11 @@ public class BudgetRegisterWorkflowService {
 
         save(budgetRegister);
 
+    }
+
+    public String getBudgetRegisterNumber(final BudgetRegister budgetRegister) {
+        final BudgetRegisterNumberGenerator budgetRegisterNumberGenerator = beanResolver.getAutoNumberServiceFor(BudgetRegisterNumberGenerator.class);
+        return budgetRegisterNumberGenerator.getNextNumber(budgetRegister);
     }
 
 

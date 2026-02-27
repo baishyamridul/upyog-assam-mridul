@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.CFinancialYearService;
+import org.egov.egf.autonumber.BudgetRegisterNumberGenerator;
 import org.egov.egf.statefinance.event.StateFinanceEventType;
 import org.egov.egf.statefinance.event.listener.StateFinanceService;
 import org.egov.egf.statefinance.model.BudgetRegisterResponse;
@@ -21,6 +22,7 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.model.budget.BudgetRegister;
 import org.egov.model.budget.register.BudgetRegisterActionsDTO;
@@ -87,6 +89,8 @@ public class BudgetRegisterController extends GenericWorkFlowController {
 
     @Autowired
     private StateFinanceService stateFinanceService;
+
+
 
 
 
@@ -164,8 +168,9 @@ public class BudgetRegisterController extends GenericWorkFlowController {
         budgetRegister.setCurrentFinancialYear(currentFy);
         budgetRegister.setFinancialYear(nextFy);
 
-        budgetRegister.setBudgetRegisterNumber(
-                budgetRegisterWorkflowService.generateBudgetRegisterNumber(nextFy.getFinYearRange()));
+//        budgetRegister.setBudgetRegisterNumber(budgetRegisterWorkflowService.generateBudgetRegisterNumber(nextFy.getFinYearRange()));
+
+        budgetRegister.setBudgetRegisterNumber(budgetRegisterWorkflowService.getBudgetRegisterNumber(budgetRegister));
 
         budgetRegister.setStatus(egwStatusDAO.getStatusByModuleAndCode(FinancialConstants.BUDGET_MODULE,
                 FinancialConstants.BUDGET_CREATED_NEW));
@@ -414,6 +419,9 @@ public class BudgetRegisterController extends GenericWorkFlowController {
         return response;
 
     }
+
+
+
 
 
 }
